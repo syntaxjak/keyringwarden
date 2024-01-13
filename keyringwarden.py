@@ -39,11 +39,25 @@ def add_key():
     save_key(service, name)
     print("Your key has been saved!")
 
+def remove_key_from_json(service, name):
+    keys_file = 'keys.json'
+    
+    with open(keys_file, 'r') as file:
+        keys = json.load(file)
+
+    # Filter out the key to be removed
+    keys = [key_info for key_info in keys if not (key_info['service'] == service and key_info['name'] == name)]
+    
+    # Write the updated keys list back to the file
+    with open(keys_file, 'w') as file:
+        json.dump(keys, file)
+        
 def remove_key():
     service = input("Enter service: ")
     name = input("Enter name: ")
     try:
         keyring.delete_password(service, name)
+        remove_key_from_json(service, name)  # Call function to remove key from json
         print("Your key has been removed!")
     except keyring.errors.PasswordDeleteError:
         print("The specified key was not found!")
